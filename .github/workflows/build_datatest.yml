@@ -67,8 +67,7 @@ jobs:
         run: |
           pwd
           echo $CMSIS_PACK_ROOT
-          ls ~
-          ls ~/.cache/cmsis-packs/
+          echo ~
           ls /home/runner/.cache/arm/packs
 #          sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/sdsio/network/sdsio_ethernet.clayer.yml|" ./Examples/USB/Device/USB_Device.csolution.yml
 
