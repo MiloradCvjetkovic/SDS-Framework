@@ -65,8 +65,9 @@ jobs:
       - name: Copy Board layer to template/Board
         run: |
           mkdir -p ./template/Board/STM32H735G-DK
-          ls -R
-          cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/ ./template/Board/STM32H735G-DK/
+          ls -a -R /home/runner/.cache/arm/packs
+#         ls -R
+#         cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/ ./template/Board/STM32H735G-DK/
 
       - name: Copy SDSIO layers to template/sdsio
         run: |
