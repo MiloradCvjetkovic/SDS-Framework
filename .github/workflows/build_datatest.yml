@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  TARGET_TYPE:  STM32H735G-DK
   TARGET_BOARD: STM32H735G-DK
-  TARGET_DEVICE: ARMCM4
   TARGET_LAYER: $SolutionDir()$/../../../.ci/Board/Board.clayer.yml
 
 jobs:
@@ -65,8 +65,9 @@ jobs:
       - name: Setup board layer
         working-directory: ./template/Board
         run: |
-          echo "Here"
-#         sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/sdsio/network/sdsio_ethernet.clayer.yml|" ./Examples/USB/Device/USB_Device.csolution.yml
+          echo pwd
+          ls ~/.cache/cmsis-packs/
+#          sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/sdsio/network/sdsio_ethernet.clayer.yml|" ./Examples/USB/Device/USB_Device.csolution.yml
 
       - name: Build DataTest example
         run: |
