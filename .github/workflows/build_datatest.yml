@@ -51,11 +51,11 @@ jobs:
 
       - name: Install required publicly released CMSIS packs
         run: |
-          cpackget add Keil.MDK-Middleware --yes
-          cpackget add MDK-Packs.IoT_Socket --yes
-          cpackget add ARM.CMSIS-Driver_STM32 --yes
-          cpackget add Keil.STM32H7xx_DFP --yes
-          cpackget add Keil.STM32H735G-DK_BSP --yes
+          cpackget add Keil.MDK-Middleware
+          cpackget add MDK-Packs.IoT_Socket
+          cpackget add ARM.CMSIS-Driver_STM32
+          cpackget add Keil.STM32H7xx_DFP
+          cpackget add Keil.STM32H735G-DK_BSP
 
       - name: Use repository version of this CMSIS pack instead of released one
         run: |
