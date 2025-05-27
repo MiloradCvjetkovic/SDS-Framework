@@ -66,6 +66,7 @@ jobs:
         working-directory: ./template/Board
         run: |
           pwd
+          echo $CMSIS_PACK_ROOT
           ls ~
           ls ~/.cache/cmsis-packs/
           ls /home/runner/.cache/arm/packs
