@@ -1,0 +1,73 @@
+name: Build DataTest example
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/build_datatest.yml
+      - 'template/**'
+      - 'layer/**'
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TARGET_BOARD: STM32H735G-DK
+  TARGET_DEVICE: ARMCM4
+  TARGET_LAYER: $SolutionDir()$/../../../.ci/Board/Board.clayer.yml
+
+jobs:
+  Build:                                # Install tools, build
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        solution: [
+          {name: FileSystem, dir: FileSystem },
+          {name: Network,    dir: Network    },
+          {name: USB,        dir: USB        }
+        ]
+
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        uses: ARM-software/cmsis-actions/vcpkg@v1
+        with:
+          config: "./.ci/vcpkg-configuration.json"
+
+      - name: Activate Arm tool license
+        uses: ARM-software/cmsis-actions/armlm@v1
+
+      - name: Initialize CMSIS pack root folder
+        run: |
+          cpackget init https://www.keil.com/pack/index.pidx
+          cpackget update-index
+
+      - name: Install required publicly released CMSIS packs
+        run: |
+          cpackget add Keil.MDK-Middleware
+          cpackget add MDK-Packs.IoT_Socket
+          cpackget add ARM.CMSIS-Driver_STM32
+          cpackget add Keil.STM32H7xx_DFP
+          cpackget add Keil.STM32H735G-DK_BSP
+
+      - name: Use repository version of this CMSIS pack instead of released one
+        run: |
+          cpackget rm ARM.SDS || true
+          cpackget add ./ARM.SDS.pdsc
+
+      - name: Setup board layer
+        working-directory: ./template/Board
+        run: |
+          echo "Here"
+#         sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/sdsio/network/sdsio_ethernet.clayer.yml|" ./Examples/USB/Device/USB_Device.csolution.yml
+
+      - name: Build DataTest example
+        run: |
+          cbuild ./template/SDS.csolution.yml --packs --update-rte --toolchain AC6
