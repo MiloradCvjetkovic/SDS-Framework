@@ -59,15 +59,15 @@ jobs:
 
       - name: Use repository version of this CMSIS pack instead of released one
         run: |
-          cpackget rm ARM.SDS || true
           cpackget add ./ARM.SDS.pdsc
 
       - name: Copy Board layer to template/Board
         run: |
           mkdir -p ./template/Board/STM32H735G-DK
-          ls -a -R /home/runner/.cache/arm/packs
-#         ls -R
-#         cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/ ./template/Board/STM32H735G-DK/
+          ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
+          cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/ ./template/Board/STM32H735G-DK/
+          ls -a -R ./template/Board/STM32H735G-DK/
+          ls -a -R template/Board/STM32H735G-DK/
 
       - name: Copy SDSIO layers to template/sdsio
         run: |
