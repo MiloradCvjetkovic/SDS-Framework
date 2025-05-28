@@ -80,6 +80,7 @@ jobs:
 
       - name: Setup board layer
         working-directory: ./${{ matrix.solution.dir }}
+        shell: bash
         run: |
           set -x
           awk '
