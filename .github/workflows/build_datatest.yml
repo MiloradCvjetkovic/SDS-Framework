@@ -66,19 +66,22 @@ jobs:
           mkdir -p ./${{ matrix.solution.dir }}
           cp -r ./template/. ./${{ matrix.solution.dir }}/
 
-      - name: Copy first ${{ env.TARGET_BOARD }} layer to template/Board/${{ env.TARGET_BOARD }}
+      - name: Copy first ${{ env.TARGET_BOARD }} layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
         run: |
           set -x
-          mkdir -p ./template/Board/$TARGET_BOARD
-          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)" ./template/Board/$TARGET_BOARD/
-          ls -a -R template/Board/$TARGET_BOARD/
+          mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
+          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)" ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
+          ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
 #         ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
 #         ls -a -R ./template/Board/STM32H735G-DK/
 #         cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/$TARGET_BOARD/
 
-      # - name: Copy SDSIO layers to template/sdsio
-      #   run: |
-      #     cp -r ./layer/ ./template/sdsio/
+      - name: Copy layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
+        run: |
+          mkdir -p ./${{ matrix.solution.dir }}/sdsio
+          cp -r ./layer/sdsio/. ./${{ matrix.solution.dir }}/sdsio/
+          ls -a -R ./${{ matrix.solution.dir }}/sdsio/
+
 
       # - name: Setup board layer
       #   working-directory: ./template/Board
