@@ -70,7 +70,7 @@ jobs:
         run: |
           set -x
           mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
-          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)" ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
+          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
           ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
 #         ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
 #         ls -a -R ./template/Board/STM32H735G-DK/
@@ -79,7 +79,7 @@ jobs:
       - name: Copy layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/sdsio
-          cp -r ./layer/sdsio/. ./${{ matrix.solution.dir }}/sdsio/
+          cp -r ./layer/sdsio/* ./${{ matrix.solution.dir }}/sdsio/
           ls -a -R ./${{ matrix.solution.dir }}/sdsio/
 
 
