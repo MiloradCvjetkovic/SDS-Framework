@@ -82,8 +82,15 @@ jobs:
         working-directory: ./${{ matrix.solution.dir }}
         run: |
           set -x
-          sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/$TARGET_BOARD/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/${{ matrix.solution.sdsio_layer_file }}\n" ./${{ matrix.solution.dir }}.csolution.yml
+          sed -i "s|- type: ${Name}|&\\
+            - type: ${TARGET_TYPE}\\
+              board: ${TARGET_BOARD}\\
+              variables:\\
+                - Board-Layer: \$SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\\
+                - SDSIO-Layer: \$SolutionDir()\\$/\${{ matrix.solution.sdsio_layer_file }}\\
+          |" "./${{ matrix.solution.dir }}.csolution.yml"
           cat ./${{ matrix.solution.dir }}.csolution.yml
+#         sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/$TARGET_BOARD/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/${{ matrix.solution.sdsio_layer_file }}\n" ./${{ matrix.solution.dir }}.csolution.yml
 
       # - name: Build DataTest example
       #   run: |
