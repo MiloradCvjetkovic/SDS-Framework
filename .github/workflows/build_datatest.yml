@@ -16,6 +16,7 @@ concurrency:
 env:
   TARGET_TYPE:  STM32H735G-DK
   TARGET_BOARD: STM32H735G-DK
+  TARGET_BSP:   STM32H735G-DK_BSP
 # TARGET_LAYER: $SolutionDir()$/../../../.ci/Board/Board.clayer.yml
 
 jobs:
@@ -65,15 +66,15 @@ jobs:
           mkdir -p ./${{ matrix.solution.dir }}
           cp -r ./template/. ./${{ matrix.solution.dir }}/
 
-      - name: Copy ${{ env.TARGET_BOARD }} layer to template/Board/${{ env.TARGET_BOARD }}
+      - name: Copy first ${{ env.TARGET_BOARD }} layer to template/Board/${{ env.TARGET_BOARD }}
         run: |
           set -x
           mkdir -p ./template/Board/$TARGET_BOARD
-          cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/$TARGET_BOARD/
-          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BOARD -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)" ./template/Board/$TARGET_BOARD/
+          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)" ./template/Board/$TARGET_BOARD/
           ls -a -R template/Board/$TARGET_BOARD/
 #         ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
 #         ls -a -R ./template/Board/STM32H735G-DK/
+#         cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/$TARGET_BOARD/
 
       # - name: Copy SDSIO layers to template/sdsio
       #   run: |
