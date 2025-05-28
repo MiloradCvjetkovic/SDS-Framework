@@ -70,6 +70,7 @@ jobs:
           set -x
           mkdir -p ./template/Board/$TARGET_BOARD
           cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/$TARGET_BOARD/
+          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BOARD -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)" ./template/Board/$TARGET_BOARD/
           ls -a -R template/Board/$TARGET_BOARD/
 #         ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
 #         ls -a -R ./template/Board/STM32H735G-DK/
