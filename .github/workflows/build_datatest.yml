@@ -92,7 +92,7 @@ jobs:
             next
           }
           { print }
-          ' SDS.csolution.yml > SDS.csolution.tmp && mv SDS.csolution.tmp SDS.csolution.yml
+          ' SDS.csolution.yml
           cat ./SDS.csolution.yml
 
 #         sed -i '/- type: ${name}/{s/.*/    - type: ${TARGET_TYPE}/a\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}}' SDS.csolution.yml
