@@ -65,7 +65,7 @@ jobs:
           mkdir -p ./${{ matrix.solution.dir }}
           cp -r ./template/. ./${{ matrix.solution.dir }}/
 
-      - name: Copy $TARGET_BOARD layer to template/Board/$TARGET_BOARD
+      - name: Copy ${{ env.TARGET_BOARD }} layer to template/Board/${{ env.TARGET_BOARD }}
         run: |
           set -x
           mkdir -p ./template/Board/$TARGET_BOARD
