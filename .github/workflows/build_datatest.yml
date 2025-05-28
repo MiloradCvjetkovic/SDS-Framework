@@ -27,9 +27,9 @@ jobs:
       fail-fast: false
       matrix:
         solution: [
-          {name: FileSystem, dir: SDS_FileSystem, layer_sdsio: ./layer/sdsio/filesystem },
-          {name: Network,    dir: SDS_Network   , layer_sdsio: ./layer/sdsio/network    },
-          {name: USB,        dir: SDS_USB       , layer_sdsio: ./layer/sdsio/usb        }
+          {name: FileSystem, dir: SDS_FileSystem, sdsio_layer_file: ./sdsio/filesystem/sdsio_fs.clayer.yml   },
+          {name: Network,    dir: SDS_Network   , sdsio_layer_file: ./sdsio/network/sdsio_network.clayer.yml },
+          {name: USB,        dir: SDS_USB       , sdsio_layer_file: ./sdsio/usb/sdsio_usb.clayer.yml         }
         ]
 
     steps:
@@ -68,13 +68,9 @@ jobs:
 
       - name: Copy first ${{ env.TARGET_BOARD }} layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
         run: |
-          set -x
           mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
           cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
           ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
-#         ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
-#         ls -a -R ./template/Board/STM32H735G-DK/
-#         cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/$TARGET_BOARD/
 
       - name: Copy layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
         run: |
@@ -82,15 +78,12 @@ jobs:
           cp -r ./layer/sdsio/* ./${{ matrix.solution.dir }}/sdsio/
           ls -a -R ./${{ matrix.solution.dir }}/sdsio/
 
-
-      # - name: Setup board layer
-      #   working-directory: ./template/Board
-      #   run: |
-      #     pwd
-      #     echo $CMSIS_PACK_ROOT
-      #     echo ~
-      #     ls /home/runner/.cache/arm/packs
-#          sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/sdsio/network/sdsio_ethernet.clayer.yml|" ./Examples/USB/Device/USB_Device.csolution.yml
+      - name: Setup board layer
+        working-directory: ./${{ matrix.solution.dir }}
+        run: |
+          set -x
+          sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/$TARGET_BOARD/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/${{ matrix.solution.sdsio_layer_file }}\n" ./${{ matrix.solution.dir }}.csolution.yml
+          cat ./${{ matrix.solution.dir }}.csolution.yml
 
       # - name: Build DataTest example
       #   run: |
