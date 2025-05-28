@@ -16,7 +16,7 @@ concurrency:
 env:
   TARGET_TYPE:  STM32H735G-DK
   TARGET_BOARD: STM32H735G-DK
-  TARGET_LAYER: $SolutionDir()$/../../../.ci/Board/Board.clayer.yml
+# TARGET_LAYER: $SolutionDir()$/../../../.ci/Board/Board.clayer.yml
 
 jobs:
   Build:                                # Install tools, build
@@ -26,11 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         solution: [
-          {name: FileSystem, dir: FileSystem },
-          {name: Network,    dir: Network    },
-          {name: USB,        dir: USB        }
+          {name: FileSystem, dir: SDS_FileSystem, layer_sdsio: ./layer/sdsio/filesystem },
+          {name: Network,    dir: SDS_Network   , layer_sdsio: ./layer/sdsio/network    },
+          {name: USB,        dir: SDS_USB       , layer_sdsio: ./layer/sdsio/usb        }
         ]
-
 
     steps:
       - name: Checkout this repository
@@ -61,29 +60,33 @@ jobs:
         run: |
           cpackget add ./ARM.SDS.pdsc
 
-      - name: Copy Board layer to template/Board
+      - name: Copy template to ${{ matrix.solution.dir }} folder
         run: |
-          mkdir -p ./template/Board/STM32H735G-DK/
-          echo "copy"
-          cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/STM32H735G-DK/
-          echo "list"
-          ls -a -R template/Board/STM32H735G-DK/
+          mkdir -p ./${{ matrix.solution.dir }}
+          cp -r ./template/. ./${{ matrix.solution.dir }}/
+
+      - name: Copy $TARGET_BOARD layer to template/Board/$TARGET_BOARD
+        run: |
+          set -x
+          mkdir -p ./template/Board/$TARGET_BOARD
+          cp -r /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/Layers/Default/. ./template/Board/$TARGET_BOARD/
+          ls -a -R template/Board/$TARGET_BOARD/
 #         ls -a -R /home/runner/.cache/arm/packs/Keil/STM32H735G-DK_BSP/3.0.0/
 #         ls -a -R ./template/Board/STM32H735G-DK/
 
-      - name: Copy SDSIO layers to template/sdsio
-        run: |
-          cp -r ./layer/ ./template/sdsio/
+      # - name: Copy SDSIO layers to template/sdsio
+      #   run: |
+      #     cp -r ./layer/ ./template/sdsio/
 
-      - name: Setup board layer
-        working-directory: ./template/Board
-        run: |
-          pwd
-          echo $CMSIS_PACK_ROOT
-          echo ~
-          ls /home/runner/.cache/arm/packs
+      # - name: Setup board layer
+      #   working-directory: ./template/Board
+      #   run: |
+      #     pwd
+      #     echo $CMSIS_PACK_ROOT
+      #     echo ~
+      #     ls /home/runner/.cache/arm/packs
 #          sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - Board-Layer: $SolutionDir()$/Board/STM32H735G-DK/Board.clayer.yml\n      - SDSIO-Layer: $SolutionDir()$/sdsio/network/sdsio_ethernet.clayer.yml|" ./Examples/USB/Device/USB_Device.csolution.yml
 
-      - name: Build DataTest example
-        run: |
-          cbuild ./template/SDS.csolution.yml --packs --update-rte --toolchain AC6
+      # - name: Build DataTest example
+      #   run: |
+      #     cbuild ./template/SDS.csolution.yml --packs --update-rte --toolchain AC6
