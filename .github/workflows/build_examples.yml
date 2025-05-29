@@ -74,7 +74,7 @@ jobs:
           mkdir -p ./${{ matrix.solution.dir }}
           cp -r ./template/. ./${{ matrix.solution.dir }}/
 
-      - name: Copy first found ${{ env.TARGET_BOARD }} layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
+      - name: Copy first found ${{ env.TARGET_BOARD }} board layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
           cp -r "$(find /home/runner/.cache/arm/packs/Keil/${TARGET_BSP#*.} -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
