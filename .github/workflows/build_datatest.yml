@@ -85,7 +85,7 @@ jobs:
           set -x
 
           sed -i "/- type: \${name}/{
-          s/- type: \${name}/- type: STM32H735IGKx\
+          s/.*/- type: STM32H735IGKx\
               board: STM32H735G-DK:Rev.B/
           }" SDS.csolution.yml
 
