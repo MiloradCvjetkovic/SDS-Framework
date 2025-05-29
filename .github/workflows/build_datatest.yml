@@ -83,18 +83,16 @@ jobs:
         shell: bash
         run: |
           set -x
-          awk '
-          /- type: \$\{name\}/ {
-            print "    - type: ${TARGET_TYPE}"
-            print "      board: ${TARGET_BOARD}"
-            print "      variables:"
-            print "        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml"
-            print "        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}"
-            next
-          }
-          { print }
-          ' SDS.csolution.yml > SDS.csolution.tmp && mv SDS.csolution.tmp SDS.csolution.yml
-          cat ./SDS.csolution.tmp
+
+          sed -i '/- type: \${name}/{
+            s/.*/    - type: ${TARGET_TYPE}/
+            a\
+                board: ${TARGET_BOARD}\
+                variables:\
+                  - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\
+                  - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}
+          }' SDS.csolution.yml
+
           cat ./SDS.csolution.yml
 
 #         sed -i '/- type: ${name}/{s/.*/    - type: ${TARGET_TYPE}/a\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}}' SDS.csolution.yml
