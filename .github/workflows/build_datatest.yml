@@ -84,12 +84,14 @@ jobs:
         run: |
           set -x
 
-          result=$(sed -i "/- type: \${name}/{
-          s/.*/- type: STM32H735IGKx\
-              board: STM32H735G-DK:Rev.B/
-          }" SDS.csolution.yml)
+          sed -i $'/\- type: \${name}/{
+          s/.*/- type: '"${TARGET_TYPE}"'/
+          a\
+          board: '"${TARGET_BOARD}"'\
+          variables:
+          }' SDS.csolution.yml
 
-          echo "$result"
+
 
           cat ./SDS.csolution.yml
 
