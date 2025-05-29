@@ -84,14 +84,11 @@ jobs:
         run: |
           set -x
 
-            sed -i "/- type: \${name}/{
-            s/.*/    - type: ${TARGET_TYPE}/
-            a\\
-          board: ${TARGET_BOARD}\\
-          variables:\\
-          - Board-Layer: \$SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\\
-          - SDSIO-Layer: a
-            }" SDS.csolution.yml
+          sed -i "/- type: \${name}/{
+          s/- type: \${name}/- type: STM32H735IGKx\
+              board: STM32H735G-DK:Rev.B/
+          }" SDS.csolution.yml
+
 
           cat ./SDS.csolution.yml
 
