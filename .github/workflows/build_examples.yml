@@ -13,11 +13,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
+env:                                    # Board selection
   TARGET_TYPE:  STM32H735G-DK
   TARGET_BOARD: STM32H735G-DK
-  TARGET_BSP:   STM32H735G-DK_BSP
-  TARGET_DFP:   STM32H7xx_DFP
+  TARGET_BSP:   Keil.STM32H735G-DK_BSP
+  TARGET_DFP:   Keil.STM32H7xx_DFP
 
 jobs:
   Build:                                # Install tools, build
@@ -25,7 +25,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
+      matrix:                           # Build all solutions in parallel
         solution: [
           {name: FileSystem, dir: SDS_FileSystem, sdsio_layer_file: $SolutionDir()\$/sdsio/filesystem/sdsio_fs.clayer.yml   },
           {name: Network,    dir: SDS_Network   , sdsio_layer_file: $SolutionDir()\$/sdsio/network/sdsio_network.clayer.yml },
@@ -44,6 +44,14 @@ jobs:
       - name: Activate Arm tool license
         uses: ARM-software/cmsis-actions/armlm@v1
 
+      - name: Cache CMSIS packs
+        uses: actions/cache@v4
+        with:
+          key: cmsis-packs-${{ hashFiles('**/*.csolution.yml', '**/*.cproject.yml', '**/*.clayer.yml') }}
+          restore-keys: |
+            cmsis-packs-
+          path: /home/runner/.cache/arm/packs
+
       - name: Initialize CMSIS pack root folder
         run: |
           cpackget init https://www.keil.com/pack/index.pidx
@@ -54,8 +62,8 @@ jobs:
           cpackget add Keil.MDK-Middleware -a
           cpackget add MDK-Packs.IoT_Socket -a
           cpackget add ARM.CMSIS-Driver_STM32 -a
-          cpackget add Keil.${TARGET_DFP} -a
-          cpackget add Keil.${TARGET_BSP} -a
+          cpackget add ${TARGET_DFP} -a
+          cpackget add ${TARGET_BSP} -a
 
       - name: Install this pack
         run: |
@@ -69,7 +77,7 @@ jobs:
       - name: Copy first found ${{ env.TARGET_BOARD }} layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
-          cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
+          cp -r "$(find /home/runner/.cache/arm/packs/Keil/${TARGET_BSP#*.} -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
           ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
 
       - name: Copy layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
