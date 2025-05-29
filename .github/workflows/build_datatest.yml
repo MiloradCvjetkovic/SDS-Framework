@@ -84,13 +84,13 @@ jobs:
         run: |
           set -x
 
-          sed -i "/- type: \${name}/{
+            sed -i "/- type: \${name}/{
             s/.*/    - type: ${TARGET_TYPE}/
             a\\
-              board: ${TARGET_BOARD}\\
-              variables:\\
-                - Board-Layer: \$SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\\
-                - SDSIO-Layer: ${MATRIX_SDSIO_LAYER_FILE}
+          board: ${TARGET_BOARD}\\
+          variables:\\
+          - Board-Layer: \$SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\\
+          - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}
             }" SDS.csolution.yml
 
           cat ./SDS.csolution.yml
