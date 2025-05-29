@@ -78,13 +78,13 @@ jobs:
           cp -r ./layer/sdsio/* ./${{ matrix.solution.dir }}/sdsio/
           ls -a -R ./${{ matrix.solution.dir }}/sdsio/
 
-      - name: Setup board layer
+      - name: Insert board target type in SDS.csolution.yml
         working-directory: ./${{ matrix.solution.dir }}
         shell: bash
         run: |
           set -x
 
-          sed -i "/- type: \\\${Name}/c\    - type: ${TARGET_TYPE}\\n      board: ${TARGET_BOARD}\\n      variables:\\n        - Board-Layer: \$SolutionDir()\$/Board/${TARGET_BOARD}/Board.clayer.yml\\n        - SDSIO-Layer: \\\${{ matrix.solution.sdsio_layer_file }}\\n" SDS.csolution.yml
+          sed -i "/- type: \\\${Name}/c\    - type: ${TARGET_TYPE}\\n      board: ${TARGET_BOARD}\\n      variables:\\n        - Board-Layer: \$SolutionDir()\$/Board/${TARGET_BOARD}/Board.clayer.yml\\n        - SDSIO-Layer: \\\${{ matrix.solution.sdsio_layer_file }}" SDS.csolution.yml
 
           cat ./SDS.csolution.yml
 
