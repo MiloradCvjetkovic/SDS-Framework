@@ -91,6 +91,8 @@ jobs:
               - SDSIO-Layer: \${{ matrix.solution.sdsio_layer_file }}
             "
 
+          echo $target_board
+
           sed -i "/- type: \${Name}/c\\$target_board" SDS.csolution.yml
 
           cat ./SDS.csolution.yml
