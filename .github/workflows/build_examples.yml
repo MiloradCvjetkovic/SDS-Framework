@@ -69,7 +69,7 @@ jobs:
         run: |
           cpackget add ./ARM.SDS.pdsc -a
 
-      - name: Copy example template to ${{ matrix.solution.dir }} folder
+      - name: Copy example template to ./${{ matrix.solution.dir }} folder
         run: |
           mkdir -p ./${{ matrix.solution.dir }}
           cp -r ./template/. ./${{ matrix.solution.dir }}/
@@ -78,21 +78,21 @@ jobs:
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
           cp -r "$(find /home/runner/.cache/arm/packs/Keil/${TARGET_BSP#*.} -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
-          ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
+          # ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
 
-      - name: Copy layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
+      - name: Copy all layers from ./layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/sdsio
           cp -r ./layer/sdsio/* ./${{ matrix.solution.dir }}/sdsio/
-          ls -a -R ./${{ matrix.solution.dir }}/sdsio/
+          # ls -a -R ./${{ matrix.solution.dir }}/sdsio/
 
-      - name: Insert target type for ${{ env.TARGET_BOARD }} board in SDS.csolution.yml
+      - name: Insert target type for ${{ env.TARGET_BOARD }} board into SDS.csolution.yml file
         working-directory: ./${{ matrix.solution.dir }}
         run: |
           sed -i "/- type: \\\${Name}/c\    - type: ${TARGET_TYPE}\\n      board: ${TARGET_BOARD}\\n      variables:\\n        - Board-Layer: \$SolutionDir()\$/Board/${TARGET_BOARD}/Board.clayer.yml\\n        - SDSIO-Layer: \\\${{ matrix.solution.sdsio_layer_file }}" SDS.csolution.yml
-          cat ./SDS.csolution.yml
+          # cat ./SDS.csolution.yml
 
-      - name: Build ./${{ matrix.solution.dir }} all projects in SDS.csolution.yml
+      - name: Build all project/targets/build combinations from ./${{ matrix.solution.dir }}/SDS.csolution.yml
         working-directory: ./${{ matrix.solution.dir }}
         run: |
           cbuild ./SDS.csolution.yml --packs --update-rte --toolchain AC6
