@@ -27,9 +27,9 @@ jobs:
       fail-fast: false
       matrix:
         solution: [
-          {name: FileSystem, dir: SDS_FileSystem, sdsio_layer_file: $SolutionDir()$/sdsio/filesystem/sdsio_fs.clayer.yml   },
-          {name: Network,    dir: SDS_Network   , sdsio_layer_file: $SolutionDir()$/sdsio/network/sdsio_network.clayer.yml },
-          {name: USB,        dir: SDS_USB       , sdsio_layer_file: $SolutionDir()$/sdsio/usb/sdsio_usb.clayer.yml         }
+          {name: FileSystem, dir: SDS_FileSystem, sdsio_layer_file: $SolutionDir()\$/sdsio/filesystem/sdsio_fs.clayer.yml   },
+          {name: Network,    dir: SDS_Network   , sdsio_layer_file: $SolutionDir()\$/sdsio/network/sdsio_network.clayer.yml },
+          {name: USB,        dir: SDS_USB       , sdsio_layer_file: $SolutionDir()\$/sdsio/usb/sdsio_usb.clayer.yml         }
         ]
 
     steps:
@@ -84,10 +84,18 @@ jobs:
         run: |
           set -x
 
-          sed -i '/- type: \${Name}/c\    - type: ${TARGET_TYPE}\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}\n' SDS.csolution.yml
+          target_board="    - type: ${TARGET_TYPE}
+            board: ${TARGET_BOARD}
+            variables:
+              - Board-Layer: \$SolutionDir()\\\$/Board/${TARGET_BOARD}/Board.clayer.yml
+              - SDSIO-Layer: \${{ matrix.solution.sdsio_layer_file }}
+            "
+
+          sed -i "/- type: \\\${Name}/c\\$target_board" SDS.csolution.yml
 
           cat ./SDS.csolution.yml
 
+#         sed -i '/- type: \${Name}/c\    - type: ${TARGET_TYPE}\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}\n\n' SDS.csolution.yml
 #         sed -i '/- type: ${name}/{s/.*/    - type: ${TARGET_TYPE}/a\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}}' SDS.csolution.yml
 #         sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/$TARGET_BOARD/Board.clayer.yml\n      - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}\n" ./${{ matrix.solution.dir }}.csolution.yml
 
