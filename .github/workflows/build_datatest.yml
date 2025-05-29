@@ -84,14 +84,7 @@ jobs:
         run: |
           set -x
 
-          sed -i '/- type: \${name}/{
-            s/.*/    - type: ${TARGET_TYPE}/
-            a\
-                board: ${TARGET_BOARD}\
-                variables:\
-                  - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\
-                  - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}
-          }' SDS.csolution.yml
+          sed -i '/- type: ${name}/{s/.*/    - type: ${TARGET_TYPE}/a\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}}' SDS.csolution.yml
 
           cat ./SDS.csolution.yml
 
@@ -99,5 +92,6 @@ jobs:
 #         sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/$TARGET_BOARD/Board.clayer.yml\n      - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}\n" ./${{ matrix.solution.dir }}.csolution.yml
 
       - name: Build ./${{ matrix.solution.dir }}/DataTest example
+        working-directory: ./${{ matrix.solution.dir }}
         run: |
-          cbuild ./template/SDS.csolution.yml --packs --update-rte --toolchain AC6
+          cbuild ./SDS.csolution.yml --packs --update-rte --toolchain AC6
