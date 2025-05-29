@@ -1,9 +1,9 @@
-name: Build DataTest example
+name: Build examples
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - .github/workflows/build_datatest.yml
+      - .github/workflows/build_examples.yml
       - 'template/**'
       - 'layer/**'
   push:
@@ -17,7 +17,7 @@ env:
   TARGET_TYPE:  STM32H735G-DK
   TARGET_BOARD: STM32H735G-DK
   TARGET_BSP:   STM32H735G-DK_BSP
-# TARGET_LAYER: $SolutionDir()$/../../../.ci/Board/Board.clayer.yml
+  TARGET_DFP:   STM32H7xx_DFP
 
 jobs:
   Build:                                # Install tools, build
@@ -54,56 +54,38 @@ jobs:
           cpackget add Keil.MDK-Middleware -a
           cpackget add MDK-Packs.IoT_Socket -a
           cpackget add ARM.CMSIS-Driver_STM32 -a
-          cpackget add Keil.STM32H7xx_DFP -a
-          cpackget add Keil.STM32H735G-DK_BSP -a
+          cpackget add Keil.${TARGET_DFP} -a
+          cpackget add Keil.${TARGET_BSP} -a
 
-      - name: Use repository version of this CMSIS pack instead of released one
+      - name: Install this pack
         run: |
-          cpackget add ./ARM.SDS.pdsc
+          cpackget add ./ARM.SDS.pdsc -a
 
-      - name: Copy template to ${{ matrix.solution.dir }} folder
+      - name: Copy example template to ${{ matrix.solution.dir }} folder
         run: |
           mkdir -p ./${{ matrix.solution.dir }}
           cp -r ./template/. ./${{ matrix.solution.dir }}/
 
-      - name: Copy first ${{ env.TARGET_BOARD }} layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
+      - name: Copy first found ${{ env.TARGET_BOARD }} layer to ./${{ matrix.solution.dir }}/Board/${{ env.TARGET_BOARD }}
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD
           cp -r "$(find /home/runner/.cache/arm/packs/Keil/$TARGET_BSP -type f -name "Board.clayer.yml" -exec dirname {} \; | head -n 1)"/* ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
-          ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
+          # ls -a -R ./${{ matrix.solution.dir }}/Board/$TARGET_BOARD/
 
       - name: Copy layer/sdsio to ./${{ matrix.solution.dir }}/sdsio
         run: |
           mkdir -p ./${{ matrix.solution.dir }}/sdsio
           cp -r ./layer/sdsio/* ./${{ matrix.solution.dir }}/sdsio/
-          ls -a -R ./${{ matrix.solution.dir }}/sdsio/
+          # ls -a -R ./${{ matrix.solution.dir }}/sdsio/
 
-      - name: Insert board target type in SDS.csolution.yml
+      - name: Insert target type for ${{ env.TARGET_BOARD }} board in SDS.csolution.yml
         working-directory: ./${{ matrix.solution.dir }}
-        shell: bash
+        # shell: bash
         run: |
-          set -x
-
           sed -i "/- type: \\\${Name}/c\    - type: ${TARGET_TYPE}\\n      board: ${TARGET_BOARD}\\n      variables:\\n        - Board-Layer: \$SolutionDir()\$/Board/${TARGET_BOARD}/Board.clayer.yml\\n        - SDSIO-Layer: \\\${{ matrix.solution.sdsio_layer_file }}" SDS.csolution.yml
+          # cat ./SDS.csolution.yml
 
-          cat ./SDS.csolution.yml
-
-          # target_board="    - type: ${TARGET_TYPE}
-          #   board: ${TARGET_BOARD}
-          #   variables:
-          #     - Board-Layer: \$SolutionDir()\\\$/Board/${TARGET_BOARD}/Board.clayer.yml
-          #     - SDSIO-Layer: \${{ matrix.solution.sdsio_layer_file }}
-          #   "
-
-          # echo $target_board
-
-          # sed -i "/- type: \\\${Name}/c\\$target_board" SDS.csolution.yml
-
-#         sed -i '/- type: \${Name}/c\    - type: ${TARGET_TYPE}\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}\n\n' SDS.csolution.yml
-#         sed -i '/- type: ${name}/{s/.*/    - type: ${TARGET_TYPE}/a\n      board: ${TARGET_BOARD}\n      variables:\n        - Board-Layer: $SolutionDir()\\$/Board/${TARGET_BOARD}/Board.clayer.yml\n        - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}}' SDS.csolution.yml
-#         sed -i "s|- type: ${Name}|&\n    - type: $TARGET_TYPE\n      board: $TARGET_BOARD\n      variables:\n      - Board-Layer: $SolutionDir()$/Board/$TARGET_BOARD/Board.clayer.yml\n      - SDSIO-Layer: ${{ matrix.solution.sdsio_layer_file }}\n" ./${{ matrix.solution.dir }}.csolution.yml
-
-      - name: Build ./${{ matrix.solution.dir }}/DataTest example
+      - name: Build ./${{ matrix.solution.dir }} all projects in SDS.csolution.yml
         working-directory: ./${{ matrix.solution.dir }}
         run: |
           cbuild ./SDS.csolution.yml --packs --update-rte --toolchain AC6
