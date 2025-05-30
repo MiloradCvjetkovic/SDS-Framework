@@ -65,9 +65,9 @@ jobs:
           cpackget add ${TARGET_DFP} -a
           cpackget add ${TARGET_BSP} -a
 
-      - name: Install this pack
+      - name: Force re-install of this pack
         run: |
-          cpackget add ./ARM.SDS.pdsc -a
+          cpackget add ./ARM.SDS.pdsc -a -F
 
       - name: Copy example template to ./${{ matrix.solution.dir }} folder
         run: |
