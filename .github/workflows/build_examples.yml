@@ -67,7 +67,7 @@ jobs:
 
       - name: Force re-install of this pack
         run: |
-          cpackget add ./ARM.SDS.pdsc -a -F
+          cpackget add ./ARM.SDS.pdsc -F
 
       - name: Copy example template to ./${{ matrix.solution.dir }} folder
         run: |
