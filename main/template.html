@@ -48,14 +48,6 @@
                 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a>
                 </li>
               </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="theory.html">Theory of Operation</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="sdsio.html">SDSIO Interface</a>
-                </li>
-              </ul>
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">SDS Template Application</a>
     <ul class="current">
@@ -79,6 +71,14 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#using-datatest">Using DataTest</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#recording-on-simulation-model">Recording on Simulation Model</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#playback-on-simulation-model">Playback on Simulation Model</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#recording-on-hardware-target">Recording on Hardware Target</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#playback-on-hardware-target">Playback on Hardware Target</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#configure-bandwidth-for-datatest">Configure Bandwidth for DataTest</a>
     </li>
         </ul>
@@ -90,16 +90,20 @@
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#example-projects">Example Projects</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#using-example-projects">Using Example Projects</a>
-    </li>
-        </ul>
     </li>
     </ul>
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="sdsio.html">SDSIO Interface</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="theory.html">Theory of Operation</a>
                 </li>
               </ul>
               <ul>
@@ -144,7 +148,7 @@
 The following <a href="sdsio.html">SDSIO interfaces</a> are pre-configured:</p>
 <ul>
 <li><a href="sdsio.html#layer-sdsio_network">Ethernet Interface</a> using the MDK-Middleware Network component.</li>
-<li><a href="sdsio.html#layer-sdsio_usb">USB Virtual COM Port Interface</a> using the MDK-Middleware USB component.</li>
+<li><a href="sdsio.html#layer-sdsio_usb">USB Bulk Interface</a> using the MDK-Middleware USB component.</li>
 <li><a href="sdsio.html#layer-sdsio_fs">Memory Card Interface</a> using the MDK-Middleware File System component.</li>
 </ul>
 <p>With a custom SDSIO interface alternative file I/O configurations are possible.</p>
@@ -261,16 +265,54 @@ The following <a href="sdsio.html">SDSIO interfaces</a> are pre-configured:</p>
 </ul>
 </div>
 <h2 id="using-datatest">Using DataTest</h2>
-<p>ToDo, explain:</p>
+<p>The DataTest project validates the communication channel.</p>
+<h3 id="recording-on-simulation-model">Recording on Simulation Model</h3>
+<ol>
+<li>Select the target <code>AVH-SSE-300</code> with Project <code>DataTest</code> and Build Type <code>DebugRec</code> to record SDS data files.</li>
+<li><a href="https://github.com/ARM-software/SDS-Framework/tree/main/template/sdsio/fvp/README.md">Build and Run</a> the application.</li>
+<li>Use <a href="utilities.html#sds-check">SDS-Check</a> to verify correctness of the recording:</li>
+</ol>
+<pre><code class="language-bash">python sds-check.py -s DataInput.0.sds
+python sds-check.py -s DataOutput.0.sds
+</code></pre>
+<p>This run should generate the files <code>DataInput.0.sds</code> and <code>DataOutput.0.sds</code> in the solution folder. The <code>DataTest</code> recorder project is configured to record 1000 data records at an interval of 10ms.</p>
+<p>When the project is restarted, new files with different names are created: <code>DataInput.1.sds</code> and <code>DataOutput.1.sds</code>. Therefore, delete the generated SDS files before restarting the application.</p>
+<h3 id="playback-on-simulation-model">Playback on Simulation Model</h3>
+<ol>
+<li>Change to Build Type <code>DebugPlay</code> (target <code>AVH-SSE-300</code> with Project <code>DataTest</code>).</li>
+<li>Build and Run the application.</li>
+</ol>
+<p>This run should read the <code>DataInput.0.sds</code> file and generate the <code>DataOutput.1.sds</code> file.</p>
+<p>Compare the output files <code>DataOutput.0.sds</code> and <code>DataOutput.1.sds</code> with any program that can compare binary files. If the communication is correct, the files should be identical.</p>
+<h3 id="recording-on-hardware-target">Recording on Hardware Target</h3>
+<ol>
+<li>Select the <code>STM32F746G-DISCO</code> target with Project <code>DataTest</code> and Build Type <code>DebugRec</code> to record SDS data files.</li>
+<li>Build and Run the application.</li>
+<li>Start and stop the recording with the user button on the evaluation board.</li>
+<li>Use <a href="utilities.html#sds-check">SDS-Check</a> to verify correctness of the recording:</li>
+</ol>
+<pre><code class="language-bash">python sds-check.py -s DataInput.0.sds
+python sds-check.py -s DataOutput.0.sds
+</code></pre>
+<p>This run should generate the files <code>DataInput.0.sds</code> and <code>DataOutput.0.sds</code> in the solution folder. When the project is restarted, new files with different names are created: <code>DataInput.1.sds</code> and <code>DataOutput.1.sds</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <ul>
-<li>how to capture the files (this could be with references to the layers)</li>
-<li>how to verify the correctness using <a href="utilities.html#sds-check">SDS-Check</a></li>
-<li>setup playback mode to verify data playback</li>
+<li>The <a href="https://arm-software.github.io/SDS-Framework/main/theory.html#filenames">algorithm for naming</a> the SDS files determines the names of the subsequent data files.</li>
 </ul>
+</div>
+<h3 id="playback-on-hardware-target">Playback on Hardware Target</h3>
+<ol>
+<li>Change to Build Type <code>DebugPlay</code> (target <code>STM32F746G-DISCO</code> with Project <code>DataTest</code>).</li>
+<li>Build and Run the application.</li>
+<li>Start the payback with the user button on the evaluation board.</li>
+</ol>
+<p>This run should read the <code>DataInput.0.sds</code> file and generate the <code>DataOutput.1.sds</code> file. The playback stops automatically at the end of a stream.</p>
+<p>Compare the output files <code>DataOutput.0.sds</code> and <code>DataOutput.1.sds</code> with any program that can compare binary files. If the communication is correct, the files should be identical.</p>
 <h3 id="configure-bandwidth-for-datatest">Configure Bandwidth for DataTest</h3>
 <p>The <strong>DataTest</strong> project uses a fixed algorithm to verify the communication interface. With the file <code>datatest/sds_algorithm_config.h</code> it is possible to configure bandwidth and interval to match the requirements of the algorithm that should be tested.</p>
 <h2 id="using-algorithmtest">Using AlgorithmTest</h2>
-<p>ToDo</p>
+<p>The project <em>AlgorithmTest</em>* allows to add custom algorithms for testing. It is prepared for recording and playback of SDS data files.</p>
 <h3 id="add-user-algorithm">Add User Algorithm</h3>
 <p>In the SDS template application these files require changes to interface with the DSP and ML algorithm that is tested:</p>
 <ul>
@@ -280,14 +322,13 @@ The following <a href="sdsio.html">SDSIO interfaces</a> are pre-configured:</p>
 </ul>
 <h2 id="example-projects">Example Projects</h2>
 <p>Configured variants of the SDS template application are provided in a separate <a href="https://github.com/Arm-Examples/sds-examples">GitHub repository github.com/Arm-Examples/sds-examples</a>. These examples show the usage of the SDS-Framework with real-world devices and use cases.</p>
-<h3 id="using-example-projects">Using Example Projects</h3>
-<p>ToDo</p>
+<p>For details refer to <strong>README.md</strong> files that are included with the example configurations.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="sdsio.html" class="btn btn-neutral float-left" title="SDSIO Interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="utilities.html" class="btn btn-neutral float-right" title="Utilities">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="sdsio.html" class="btn btn-neutral float-right" title="SDSIO Interface">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -314,10 +355,10 @@ The following <a href="sdsio.html">SDSIO interfaces</a> are pre-configured:</p>
         </span>
     
     
-      <span><a href="sdsio.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="overview.html" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="utilities.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="sdsio.html" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
