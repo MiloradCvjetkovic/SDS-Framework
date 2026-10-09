@@ -79,4 +79,4 @@ jobs:
             -o "${RUNNER_TEMP}/${{ matrix.output }}" \
             -y "sds-sample-data/${{ matrix.metadata }}"
           test -s "${RUNNER_TEMP}/${{ matrix.output }}"
-          # cmp "${RUNNER_TEMP}/${{ matrix.output }}" "sds-sample-data/${{ matrix.output }}"
+          cmp "${RUNNER_TEMP}/${{ matrix.output }}" "sds-sample-data/${{ matrix.output }}"
