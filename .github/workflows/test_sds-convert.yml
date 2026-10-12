@@ -73,10 +73,19 @@ jobs:
       - name: Convert ${{ matrix.sample }} using ${{ matrix.format }}
         shell: bash
         run: |
-          set -euo pipefail
           python utilities/sds-convert.py "${{ matrix.format }}" \
             -i "sds-sample-data/${{ matrix.sample }}" \
             -o "${RUNNER_TEMP}/${{ matrix.output }}" \
             -y "sds-sample-data/${{ matrix.metadata }}"
           test -s "${RUNNER_TEMP}/${{ matrix.output }}"
+          cmp "${RUNNER_TEMP}/${{ matrix.output }}" "sds-sample-data/converted/${{ matrix.output }}"
+
+      - name: Check that ${{ matrix.output }} converted file was created
+        shell: bash
+        run: |
+          test -s "${RUNNER_TEMP}/${{ matrix.output }}"
+
+      - name: Check that ${{ matrix.output }} converted file matches expected converted file
+        shell: bash
+        run: |
           cmp "${RUNNER_TEMP}/${{ matrix.output }}" "sds-sample-data/converted/${{ matrix.output }}"
