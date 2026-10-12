@@ -91,7 +91,7 @@ jobs:
         run: |
           test -s "${RUNNER_TEMP}/${{ matrix.output }}"
 
-      - name: Compare ${{ matrix.output }} with reference output
+      - name: Compare ${{ matrix.output }} with reference file
         shell: bash
         run: |
           actual="${RUNNER_TEMP}/${{ matrix.output }}"
