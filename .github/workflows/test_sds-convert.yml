@@ -51,10 +51,10 @@ jobs:
           - { sample: Test_Out.3.sds,      metadata: Test_Out.sds.yml,      format: csv,       output: Test_Out.3.csv }
 
     steps:
-      - name: Checkout SDS Framework
+      - name: Check out SDS Framework
         uses: actions/checkout@v7
 
-      - name: Checkout SDS sample data
+      - name: Check out SDS sample data
         uses: actions/checkout@v7
         with:
           repository: Open-CMSIS-Pack/sds-sample-data
@@ -67,7 +67,7 @@ jobs:
           cache: pip
           cache-dependency-path: utilities/requirements.txt
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: python -m pip install -r utilities/requirements.txt
 
       - name: Install FFmpeg for video comparison
@@ -78,7 +78,7 @@ jobs:
           ffmpeg -version
           ffprobe -version
 
-      - name: Convert ${{ matrix.sample }} using ${{ matrix.format }}
+      - name: Convert ${{ matrix.sample }} to ${{ matrix.format }}
         shell: bash
         run: |
           python utilities/sds-convert.py "${{ matrix.format }}" \
@@ -86,12 +86,12 @@ jobs:
             -o "${RUNNER_TEMP}/${{ matrix.output }}" \
             -y "sds-sample-data/${{ matrix.metadata }}"
 
-      - name: Check that ${{ matrix.output }} converted file was created
+      - name: Verify ${{ matrix.output }} is nonempty
         shell: bash
         run: |
           test -s "${RUNNER_TEMP}/${{ matrix.output }}"
 
-      - name: Check that ${{ matrix.output }} converted file matches expected converted file
+      - name: Compare ${{ matrix.output }} with reference output
         shell: bash
         run: |
           actual="${RUNNER_TEMP}/${{ matrix.output }}"
