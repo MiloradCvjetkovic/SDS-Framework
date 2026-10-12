@@ -86,4 +86,28 @@ jobs:
       - name: Check that ${{ matrix.output }} converted file matches expected converted file
         shell: bash
         run: |
-          cmp "${RUNNER_TEMP}/${{ matrix.output }}" "sds-sample-data/converted/${{ matrix.output }}"
+          actual="${RUNNER_TEMP}/${{ matrix.output }}"
+          expected="sds-sample-data/converted/${{ matrix.output }}"
+
+          if [[ "$actual" == *.mp4 ]]; then
+            # Compare frame count, dimensions, and frame rate before visual similarity.
+            actual_video=$(ffprobe -v error -count_frames -select_streams v:0 \
+              -show_entries stream=width,height,r_frame_rate,nb_read_frames -of csv=p=0 "$actual")
+            expected_video=$(ffprobe -v error -count_frames -select_streams v:0 \
+              -show_entries stream=width,height,r_frame_rate,nb_read_frames -of csv=p=0 "$expected")
+            if [[ -z "$actual_video" || "$actual_video" != "$expected_video" ]]; then
+              echo "Video frame count, dimensions, or frame rate differ: $actual_video vs $expected_video" >&2
+              exit 1
+            fi
+
+            ssim_output=$(ffmpeg -hide_banner -i "$actual" -i "$expected" \
+              -filter_complex '[0:v:0][1:v:0]ssim' -an -f null - 2>&1)
+            ssim_score=$(sed -n 's/.*All:\([0-9.]*\).*/\1/p' <<< "$ssim_output" | tail -n 1)
+            echo "Video SSIM: $ssim_score (minimum: 0.98)"
+            if [[ -z "$ssim_score" ]] || ! awk -v score="$ssim_score" 'BEGIN { exit !(score >= 0.98) }'; then
+              echo "$ssim_output" >&2
+              exit 1
+            fi
+          else
+            cmp "$actual" "$expected"
+          fi
