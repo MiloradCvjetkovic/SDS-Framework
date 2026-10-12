@@ -68,7 +68,9 @@ jobs:
           cache-dependency-path: utilities/requirements.txt
 
       - name: Install dependencies
-        run: python -m pip install -r utilities/requirements.txt
+        run: |
+          python -m pip install -r utilities/requirements.txt
+          python -m pip install ffmpeg-python
 
       - name: Convert ${{ matrix.sample }} using ${{ matrix.format }}
         shell: bash
